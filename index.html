@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>菁菁房地產顧問工具</title>
+    <link rel="stylesheet" href="./styles.css?v=20260705-4" />
+    <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script defer src="./app.js?v=20260705-4"></script>
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div>
+          <span class="brand-pill">菁菁房地產顧問工具</span>
+          <h1>菁菁客戶推薦頁產生器</h1>
+          <p>精準整理物件亮點，打造客戶專屬菁選屋</p>
+        </div>
+        <button class="ghost-button" id="sampleButton" type="button">
+          <i data-lucide="sparkles" aria-hidden="true"></i>
+          載入菁菁範例
+        </button>
+      </header>
+
+      <main class="generator-layout">
+        <aside class="profile-panel" aria-label="菁菁顧問資料">
+          <div class="profile-identity">
+            <img class="profile-photo" src="./assets/jingjing-portrait.png" alt="尹菁菁人像" />
+            <div>
+              <span class="eyebrow">專屬顧問</span>
+              <h2>尹菁菁</h2>
+            </div>
+          </div>
+          <p>陪您找到心目中的家</p>
+
+          <dl class="profile-list">
+            <div>
+              <dt>📞 電話</dt>
+              <dd>0910-692-946</dd>
+            </div>
+            <div>
+              <dt>💬 LINE</dt>
+              <dd>nicolyyin</dd>
+            </div>
+            <div>
+              <dt>證號</dt>
+              <dd>115登字第502348號</dd>
+            </div>
+          </dl>
+        </aside>
+
+        <section class="tool-panel" aria-label="整理工作台">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">整理工作台</span>
+            </div>
+            <span class="status-pill" id="listingCount">0 筆物件</span>
+          </div>
+
+          <form id="generatorForm" class="generator-form">
+            <label class="field">
+              <span>客戶稱呼</span>
+              <input id="customerName" type="text" placeholder="黃小姐" autocomplete="off" />
+            </label>
+
+            <label class="field">
+              <span>需求摘要</span>
+              <input id="summary" type="text" placeholder="北屯三房平車，近捷運與學區" />
+            </label>
+
+            <label class="field field-wide">
+              <span>物件清單</span>
+              <small>可貼短網址、一般物件網址，或「物件標題 + 網址」。不含網址的文字會略過。</small>
+              <textarea
+                id="rawListings"
+                rows="9"
+                placeholder="例：&#10;水湳經貿三房平車&#10;https://x.ychouse.tw/a12B3&#10;&#10;十期採光三房 https://example.com/listing/1001"
+              ></textarea>
+            </label>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>頂部標籤</span>
+                <small>客戶頁最上方的精選標籤。留空 = 菁菁精選</small>
+                <input id="topTag" type="text" placeholder="菁菁精選" autocomplete="off" />
+              </label>
+
+              <label class="field">
+                <span>頁尾簽名</span>
+                <small>客戶頁最下方的大標題。留空 = 尹菁菁</small>
+                <input id="signature" type="text" placeholder="尹菁菁" autocomplete="off" />
+              </label>
+            </div>
+
+            <fieldset class="contact-fieldset">
+              <legend>聯絡資料</legend>
+              <p class="fieldset-note">
+                留空 = 用菁菁的資料（電話 0910-692-946 / LINE nicolyyin / 證號 115登字第502348號）。
+                要換給其他同事的客戶用就填下面 4 欄，4 個一起改才符合法規揭露。
+              </p>
+              <div class="field-grid">
+                <label class="field">
+                  <span>顧問姓名</span>
+                  <input id="agentName" type="text" placeholder="尹菁菁" autocomplete="off" />
+                </label>
+
+                <label class="field">
+                  <span>營業員證號</span>
+                  <input id="licenseNo" type="text" placeholder="115登字第502348號" autocomplete="off" />
+                </label>
+
+                <label class="field">
+                  <span>📞 電話</span>
+                  <input id="phone" type="tel" placeholder="0910-692-946" autocomplete="off" />
+                </label>
+
+                <label class="field">
+                  <span>💬 LINE ID</span>
+                  <input id="lineId" type="text" placeholder="nicolyyin" autocomplete="off" />
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="listing-editor" id="listingEditor" aria-live="polite"></div>
+
+            <div class="action-row">
+              <button class="secondary-button" id="previewNotesButton" type="button" disabled>
+                <i data-lucide="list-checks" aria-hidden="true"></i>
+                預覽與備註
+              </button>
+              <button class="primary-button" id="generateButton" type="submit" disabled>
+                <i data-lucide="wand-sparkles" aria-hidden="true"></i>
+                產生分享頁
+              </button>
+              <button class="secondary-button" id="copyButton" type="button" disabled>
+                <i data-lucide="copy" aria-hidden="true"></i>
+                複製連結
+              </button>
+              <button class="secondary-button" id="downloadButton" type="button" disabled>
+                <i data-lucide="download" aria-hidden="true"></i>
+                下載 HTML
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="preview-panel" aria-labelledby="previewTitle">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">客戶視角</span>
+              <h2 id="previewTitle">菁選看屋提案</h2>
+            </div>
+            <button class="icon-button" id="openPageButton" type="button" disabled aria-label="開啟客戶頁">
+              <i data-lucide="external-link" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="share-box" id="shareBox" hidden>
+            <label for="shareLink">分享連結</label>
+            <input id="shareLink" type="text" readonly />
+          </div>
+
+          <div id="previewSurface" class="preview-surface">
+            <div class="empty-preview">
+              <span class="empty-icon" aria-hidden="true"></span>
+              <h3>貼上物件後會產生預覽</h3>
+              <p>左側資料會即時同步到這裡，產生後可複製連結或下載單頁 HTML。</p>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="app-footer">
+        <span>菁菁房地產顧問工具</span>
+        <span>資料只保存在目前瀏覽器與產生的網址內。</span>
+      </footer>
+    </div>
+  </body>
+</html>

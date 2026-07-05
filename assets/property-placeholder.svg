@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-labelledby="title desc">
+  <title id="title">物件照片讀取中</title>
+  <desc id="desc">中性的物件照片讀取中佔位圖。</desc>
+  <rect width="900" height="620" fill="#fff8f4" />
+  <rect x="72" y="74" width="756" height="472" rx="20" fill="#fbf0ec" stroke="#eaded8" stroke-width="4" />
+  <path fill="#e8d8d1" d="M143 461 329 292l101 91 73-65 254 143H143Z" />
+  <circle cx="648" cy="202" r="54" fill="#f2d6d4" />
+  <path fill="#b56f7a" d="M242 221h242v240H242z" opacity=".18" />
+  <path fill="none" stroke="#b56f7a" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M286 461V296l77-64 77 64v165" />
+  <path fill="#fffdfb" stroke="#b56f7a" stroke-width="14" d="M342 461V360h42v101" />
+  <text x="450" y="560" fill="#7a6a6e" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="34" font-weight="700" text-anchor="middle">讀取物件照片中</text>
+</svg>
