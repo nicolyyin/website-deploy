@@ -13,7 +13,7 @@
     },
     {
       "source": "/p/:id",
-      "destination": "/home.html"
+      "destination": "/proposal.html"
     },
     {
       "source": "/stats",
@@ -31,7 +31,29 @@
       ]
     },
     {
+      "source": "/proposal.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noimageindex"
+        }
+      ]
+    },
+    {
       "source": "/proposal-customizations.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/share-message.js",
       "headers": [
         {
           "key": "Cache-Control",
