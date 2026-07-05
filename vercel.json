@@ -13,7 +13,7 @@
     },
     {
       "source": "/p/:id",
-      "destination": "/proposal.html"
+      "destination": "/api/share/:id"
     },
     {
       "source": "/stats",
