@@ -1,12 +1,39 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
+      "destination": "/home",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/home",
       "destination": "/home.html"
     },
     {
       "source": "/stats",
       "destination": "/stats.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/home.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/proposal-customizations.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     }
   ]
 }
