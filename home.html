@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>菁菁房地產顧問工具</title>
-    <link rel="stylesheet" href="./styles.css?v=20260705-4" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-1" />
     <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script defer src="./app.js?v=20260705-6"></script>
-    <script defer src="./proposal-customizations.js?v=20260705-1"></script>
+    <script defer src="./proposal-customizations.js?v=20260706-1"></script>
   </head>
   <body>
     <div id="app">
@@ -135,7 +135,7 @@
               </button>
               <button class="secondary-button" id="copyButton" type="button" disabled>
                 <i data-lucide="copy" aria-hidden="true"></i>
-                複製連結
+                複製分享文字
               </button>
               <button class="secondary-button" id="downloadButton" type="button" disabled>
                 <i data-lucide="download" aria-hidden="true"></i>
@@ -157,15 +157,15 @@
           </div>
 
           <div class="share-box" id="shareBox" hidden>
-            <label for="shareLink">分享連結</label>
-            <input id="shareLink" type="text" readonly />
+            <label for="shareLink">分享給客戶的文字</label>
+            <textarea id="shareLink" rows="4" readonly></textarea>
           </div>
 
           <div id="previewSurface" class="preview-surface">
             <div class="empty-preview">
               <span class="empty-icon" aria-hidden="true"></span>
               <h3>貼上物件後會產生預覽</h3>
-              <p>左側資料會即時同步到這裡，產生後可複製連結或下載單頁 HTML。</p>
+              <p>左側資料會即時同步到這裡，產生後可複製分享文字或下載單頁 HTML。</p>
             </div>
           </div>
         </aside>
@@ -173,7 +173,7 @@
 
       <footer class="app-footer">
         <span>菁菁房地產顧問工具</span>
-        <span>資料只保存在目前瀏覽器與產生的網址內。</span>
+        <span>提案資料儲存於私人空間，客戶透過專屬短連結查看。</span>
       </footer>
     </div>
   </body>
