@@ -1,5 +1,6 @@
 const MAX_HTML_BYTES = 4_000_000;
-const FETCH_TIMEOUT_MS = 12000;
+const FETCH_TIMEOUT_MS = 22000;
+const FETCH_ATTEMPTS = 2;
 
 module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") {
@@ -64,6 +65,26 @@ function normalizeRequestUrl(value) {
 }
 
 async function fetchHtml(target) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    try {
+      return await fetchHtmlOnce(target);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= FETCH_ATTEMPTS || !isRetryableFetchError(error)) break;
+      await sleep(900 * attempt);
+    }
+  }
+
+  if (lastError?.name === "AbortError") {
+    throw httpError(504, "upstream_timeout", "物件頁讀取逾時，系統已自動重試，請稍後再試。");
+  }
+
+  throw lastError;
+}
+
+async function fetchHtmlOnce(target) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -74,6 +95,7 @@ async function fetchHtml(target) {
       headers: {
         accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "accept-language": "zh-TW,zh;q=0.9,en;q=0.6",
+        "cache-control": "no-cache",
         "user-agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36",
       },
@@ -105,6 +127,17 @@ async function fetchHtml(target) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function isRetryableFetchError(error) {
+  if (!error) return false;
+  if (error.name === "AbortError") return true;
+  const status = Number(error.statusCode || 0);
+  return status === 408 || status === 429 || status >= 500;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function extractPropertyMeta(html, finalUrl) {
