@@ -149,3 +149,183 @@
     return value ? `https://www.instagram.com/${encodeURIComponent(value)}/` : "#";
   }
 })();
+
+(() => {
+  "use strict";
+
+  let cachedFingerprint = "";
+  let cachedLink = "";
+  let pendingSave = null;
+  const storedProposalId = proposalIdFromPath();
+
+  if (storedProposalId) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      (event) => {
+        event.stopImmediatePropagation();
+        renderStoredProposal(storedProposalId);
+      },
+      true,
+    );
+  }
+
+  document.addEventListener(
+    "submit",
+    (event) => {
+      if (storedProposalId || event.target?.id !== "generatorForm") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      createAndShowShortLink();
+    },
+    true,
+  );
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (storedProposalId) return;
+      const button = event.target.closest("#copyButton, #openPageButton");
+      if (!button) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (button.id === "copyButton") {
+        createAndShowShortLink({ copy: true });
+        return;
+      }
+
+      const openedWindow = window.open("about:blank", "_blank");
+      createAndShowShortLink({ openedWindow });
+    },
+    true,
+  );
+
+  async function createAndShowShortLink(options = {}) {
+    if (!allMetadataReady()) {
+      showToast("請等物件標題、照片與資料讀取完成");
+      if (options.openedWindow) options.openedWindow.close();
+      return "";
+    }
+
+    setShareButtonsBusy(true);
+
+    try {
+      const link = await saveCurrentProposal();
+      showShareLink(link);
+
+      if (options.copy) {
+        await copyText(link);
+        showToast("短連結已複製");
+      } else if (options.openedWindow) {
+        options.openedWindow.location.href = link;
+      } else {
+        showToast("短連結已產生");
+      }
+
+      return link;
+    } catch (error) {
+      if (options.openedWindow) options.openedWindow.close();
+      showToast(error.message || "短連結產生失敗，請稍後再試");
+      return "";
+    } finally {
+      setShareButtonsBusy(false);
+    }
+  }
+
+  async function saveCurrentProposal() {
+    const payload = {
+      ...buildPayload(),
+      version: 3,
+      createdAt: new Date().toISOString(),
+    };
+    const fingerprint = JSON.stringify(payload);
+
+    if (fingerprint === cachedFingerprint && cachedLink) return cachedLink;
+    if (pendingSave && fingerprint === cachedFingerprint) return pendingSave;
+
+    cachedFingerprint = fingerprint;
+    pendingSave = fetch("/api/proposals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: fingerprint,
+    })
+      .then(async (response) => {
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.message || "短連結產生失敗");
+        }
+        return `${window.location.origin}${result.path}`;
+      })
+      .then((link) => {
+        cachedLink = link;
+        state.lastShareLink = link;
+        return link;
+      })
+      .finally(() => {
+        pendingSave = null;
+      });
+
+    return pendingSave;
+  }
+
+  function showShareLink(link) {
+    if (!els.shareBox || !els.shareLink) return;
+    els.shareBox.hidden = false;
+    els.shareLink.value = link;
+    els.shareLink.focus();
+    els.shareLink.select();
+  }
+
+  function setShareButtonsBusy(busy) {
+    [els.generateButton, els.copyButton, els.openPageButton].filter(Boolean).forEach((button) => {
+      button.dataset.shortLinkBusy = busy ? "true" : "false";
+      button.disabled = busy;
+    });
+  }
+
+  async function renderStoredProposal(id) {
+    document.body.classList.add("client-mode");
+    const app = document.querySelector("#app");
+    if (!app) return;
+
+    app.innerHTML = `
+      <main class="client-shell">
+        <div class="empty-preview">
+          <h1>正在開啟專屬提案</h1>
+          <p>物件資料載入中，請稍候。</p>
+        </div>
+      </main>
+    `;
+
+    try {
+      const response = await fetch(`/api/proposals?id=${encodeURIComponent(id)}`, { cache: "no-store" });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.message || "找不到這份提案");
+
+      payload.shareId = id;
+      app.innerHTML = `
+        <main class="client-shell">
+          ${renderClientMarkup(payload)}
+        </main>
+      `;
+      bindShareTracking(payload, { trackView: true });
+      activateIcons();
+    } catch (error) {
+      app.innerHTML = `
+        <main class="client-shell">
+          <div class="empty-preview">
+            <h1>這份提案暫時無法開啟</h1>
+            <p>${escapeHtml(error.message || "請稍後再試，或請顧問重新產生連結。")}</p>
+            <a class="client-action" href="/home">回到產生器</a>
+          </div>
+        </main>
+      `;
+    }
+  }
+
+  function proposalIdFromPath() {
+    const match = window.location.pathname.match(/\/p\/([A-Za-z0-9_-]{8,20})\/?$/);
+    return match ? match[1] : "";
+  }
+})();
