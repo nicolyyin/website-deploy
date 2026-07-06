@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>客戶物件點擊統計</title>
+    <meta name="description" content="查看客戶物件提案開啟、物件點擊與互動統計。" />
+    <meta name="robots" content="noindex,nofollow,noarchive,noimageindex" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="客戶物件點擊統計" />
+    <meta property="og:description" content="查看客戶物件提案開啟、物件點擊與互動統計。" />
+    <meta property="og:url" content="https://website-deploy-nicoleyin.vercel.app/customer-stats" />
+    <meta property="og:image" content="https://website-deploy-nicoleyin.vercel.app/assets/transparent-preview.png" />
+    <meta property="og:image:width" content="1" />
+    <meta property="og:image:height" content="1" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="客戶物件點擊統計" />
+    <meta name="twitter:description" content="查看客戶物件提案開啟、物件點擊與互動統計。" />
+    <meta name="twitter:image" content="https://website-deploy-nicoleyin.vercel.app/assets/transparent-preview.png" />
+    <link rel="canonical" href="https://website-deploy-nicoleyin.vercel.app/customer-stats" />
+    <link rel="stylesheet" href="./stats.css?v=20260707-1" />
+    <script defer src="./stats.js?v=20260707-1"></script>
+  </head>
+  <body>
+    <main class="stats-shell">
+      <header class="stats-header">
+        <div>
+          <span class="stats-pill">菁菁後台</span>
+          <h1>客戶物件點擊統計</h1>
+          <p>依客戶查看每一個提案、點擊哪些物件網址，以及喜歡、電話與 LINE 的互動。</p>
+        </div>
+        <div class="stats-actions" id="statsActions" hidden>
+          <label class="period-control">
+            <span>統計期間</span>
+            <select id="periodSelect">
+              <option value="7">近 7 天</option>
+              <option value="30" selected>近 30 天</option>
+              <option value="90">近 90 天</option>
+              <option value="365">近 1 年</option>
+              <option value="0">全部</option>
+            </select>
+          </label>
+          <button id="refreshButton" type="button">重新整理</button>
+          <button id="logoutButton" class="secondary-action" type="button">登出</button>
+        </div>
+      </header>
+
+      <section id="loginPanel" class="login-panel">
+        <div>
+          <span class="section-kicker">Private Dashboard</span>
+          <h2>進入統計後台</h2>
+          <p>輸入後台密碼後，才能查看客戶姓名與物件點擊紀錄。</p>
+        </div>
+        <form id="loginForm" class="login-form">
+          <label>
+            <span>後台密碼</span>
+            <input id="adminKey" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">登入統計後台</button>
+        </form>
+      </section>
+
+      <p class="load-message" id="loadMessage" role="status" hidden></p>
+
+      <section id="dashboard" class="dashboard" hidden>
+        <section class="summary-grid" id="summaryGrid" aria-label="總覽"></section>
+
+        <section class="stats-section customer-focus-section">
+          <div class="section-heading">
+            <span>Customer Click Detail</span>
+            <h2>每位客人的物件點擊明細</h2>
+            <p>主要查看每位客人開啟幾次提案、點擊哪些物件，以及各物件的點擊次數。</p>
+          </div>
+          <div id="customerDetailList" class="customer-detail-list"></div>
+        </section>
+
+        <section class="stats-section">
+          <div class="section-heading">
+            <span>Property Ranking</span>
+            <h2>物件互動排行</h2>
+          </div>
+          <div id="propertyList" class="property-list"></div>
+        </section>
+
+        <section class="stats-section">
+          <div class="section-heading">
+            <span>Customers</span>
+            <h2>客戶互動總表</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>客戶</th>
+                  <th>需求</th>
+                  <th>開啟</th>
+                  <th>物件點擊</th>
+                  <th>喜歡</th>
+                  <th>電話</th>
+                  <th>LINE</th>
+                  <th>最近互動</th>
+                </tr>
+              </thead>
+              <tbody id="customerRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="stats-section">
+          <div class="section-heading">
+            <span>Recent</span>
+            <h2>最近事件</h2>
+          </div>
+          <div id="recentList" class="recent-list"></div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
