@@ -1,30 +1,19 @@
-const STORAGE_KEY = "jingjingStatsAdminKey";
 const els = {};
-let adminKey = "";
 
- document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
   bindEvents();
-
-  adminKey = sessionStorage.getItem(STORAGE_KEY) || "";
-  if (adminKey) {
-    loadStats();
-  } else {
-    showLogin();
-  }
+  loadStats();
 });
 
 function cacheElements() {
   Object.assign(els, {
     loginPanel: document.querySelector("#loginPanel"),
-    loginForm: document.querySelector("#loginForm"),
-    adminKey: document.querySelector("#adminKey"),
     loadMessage: document.querySelector("#loadMessage"),
     dashboard: document.querySelector("#dashboard"),
     statsActions: document.querySelector("#statsActions"),
     periodSelect: document.querySelector("#periodSelect"),
     refreshButton: document.querySelector("#refreshButton"),
-    logoutButton: document.querySelector("#logoutButton"),
     summaryGrid: document.querySelector("#summaryGrid"),
     customerDetailList: document.querySelector("#customerDetailList"),
     propertyList: document.querySelector("#propertyList"),
@@ -34,77 +23,40 @@ function cacheElements() {
 }
 
 function bindEvents() {
-  els.loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    adminKey = els.adminKey.value.trim();
-    if (!adminKey) return;
-    sessionStorage.setItem(STORAGE_KEY, adminKey);
-    loadStats();
-  });
-
-  els.refreshButton.addEventListener("click", loadStats);
-  els.periodSelect.addEventListener("change", loadStats);
-  els.logoutButton.addEventListener("click", () => {
-    sessionStorage.removeItem(STORAGE_KEY);
-    adminKey = "";
-    els.adminKey.value = "";
-    showLogin();
-  });
+  els.refreshButton?.addEventListener("click", loadStats);
+  els.periodSelect?.addEventListener("change", loadStats);
 }
 
 async function loadStats() {
-  if (!adminKey) {
-    showLogin();
-    return;
-  }
-
   showLoading("讀取統計中...");
 
   try {
-    const days = els.periodSelect.value || "30";
-    const response = await fetch(`/api/stats?days=${encodeURIComponent(days)}`, {
+    const days = els.periodSelect?.value || "30";
+    const response = await fetch(`/api/public-stats?days=${encodeURIComponent(days)}`, {
       cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${adminKey}`,
-      },
     });
     const json = await response.json().catch(() => ({}));
-
-    if (response.status === 401) {
-      sessionStorage.removeItem(STORAGE_KEY);
-      adminKey = "";
-      throw new Error(json.message || "後台密碼不正確。");
-    }
 
     if (!response.ok) {
       throw new Error(json.message || "無法讀取統計");
     }
 
-    els.loginPanel.hidden = true;
+    if (els.loginPanel) els.loginPanel.hidden = true;
     els.dashboard.hidden = false;
     els.statsActions.hidden = false;
     els.loadMessage.hidden = true;
     renderStats(json);
   } catch (error) {
+    if (els.loginPanel) els.loginPanel.hidden = true;
     els.dashboard.hidden = true;
     els.statsActions.hidden = true;
-    els.loginPanel.hidden = false;
     els.loadMessage.hidden = false;
     els.loadMessage.textContent = error.message || "無法讀取統計";
-    els.adminKey.focus();
   }
 }
 
-function showLogin() {
-  els.loginPanel.hidden = false;
-  els.dashboard.hidden = true;
-  els.statsActions.hidden = true;
-  els.loadMessage.hidden = true;
-  window.setTimeout(() => els.adminKey.focus(), 0);
-}
-
 function showLoading(message) {
-  els.loginPanel.hidden = true;
+  if (els.loginPanel) els.loginPanel.hidden = true;
   els.dashboard.hidden = true;
   els.statsActions.hidden = true;
   els.loadMessage.hidden = false;
