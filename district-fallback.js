@@ -104,7 +104,6 @@
     "麥寮鄉",
     "東勢鄉",
     "褒忠鄉",
-    "臺西鄉",
     "台西鄉",
     "元長鄉",
     "四湖鄉",
@@ -171,11 +170,12 @@
     }
 
     for (const district of CENTRAL_DISTRICTS) {
-      const normalizedDistrict = district.replace(/臺/g, "台");
-      if (text.includes(normalizedDistrict)) return normalizedDistrict;
+      if (text.includes(district)) return district;
+    }
 
-      const shortName = normalizedDistrict.replace(/[區鄉鎮市]$/, "");
-      if (shortName.length >= 2 && text.includes(shortName)) return normalizedDistrict;
+    for (const district of CENTRAL_DISTRICTS) {
+      const shortName = district.replace(/[區鄉鎮市]$/, "");
+      if (shortName.length >= 2 && text.includes(shortName)) return district;
     }
 
     const genericMatches = text.match(/[\u4e00-\u9fff]{1,6}(?:區|鄉|鎮|市)/g) || [];
